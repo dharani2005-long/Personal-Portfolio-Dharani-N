@@ -28,7 +28,11 @@ const formMessage = document.getElementById("formMessage");
 form.addEventListener("submit", async function (e) {
     e.preventDefault();
 
-    const formData = new FormData(form);
+    const formData = {
+        name: form.name.value,
+        email: form.email.value,
+        message: form.message.value
+    };
 
     const originalText = submitBtn.innerHTML;
 
@@ -39,9 +43,12 @@ form.addEventListener("submit", async function (e) {
 
     try {
 
-        const response = await fetch("https://api.web3forms.com/submit", {
+        const response = await fetch("/api/contact", {
             method: "POST",
-            body: formData
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(formData)
         });
 
         const result = await response.json();
