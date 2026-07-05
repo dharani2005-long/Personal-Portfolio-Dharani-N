@@ -1,61 +1,85 @@
-export default async function handler(req, res) {
+// export default async function handler(req, res) {
 
-    if (req.method !== "POST") {
-        return res.status(405).json({
-            success: false,
-            message: "Method Not Allowed"
-        });
-    }
+//     if (req.method !== "POST") {
+//         return res.status(405).json({
+//             success: false,
+//             message: "Method Not Allowed"
+//         });
+//     }
 
-    try {
+//     try {
 
-        const response = await fetch(
-            "https://api.web3forms.com/submit",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    access_key: process.env.MY_ACCESS_KEY,
-                    subject: "New message from your portfolio",
-                    from_name: "Dharani N Portfolio",
-                    ...req.body
-                })
-            }
-        );
+//         const response = await fetch(
+//             "https://api.web3forms.com/submit",
+//             {
+//                 method: "POST",
+//                 headers: {
+//                     "Content-Type": "application/json"
+//                 },
+//                 body: JSON.stringify({
+//                     access_key: process.env.MY_ACCESS_KEY,
+//                     subject: "New message from your portfolio",
+//                     from_name: "Dharani N Portfolio",
+//                     ...req.body
+//                 })
+//             }
+//         );
 
-        const data = await response.json();
+//         const data = await response.json();
 
-        return res.status(200).json(data);
+//         return res.status(200).json(data);
 
-    } catch (error) {
+//     } catch (error) {
 
-        return res.status(500).json({
-            success: false,
-            message: "Internal Server Error"
-        });
+//         return res.status(500).json({
+//             success: false,
+//             message: "Internal Server Error"
+//         });
 
-    }
-}
+//     }
+// }
 //-----------------------------
 
 
 
-// export default async function handler(req, res) {
-//     try {
-//         console.log("Access Key:", process.env.MY_ACCESS_KEY);
+export default async function handler(req, res) {
+  try {
+    console.log("Method:", req.method);
+    console.log("Body:", req.body);
+    console.log("Access Key Exists:", !!process.env.MY_ACCESS_KEY);
 
-//         return res.status(200).json({
-//             success: true,
-//             keyExists: !!process.env.MY_ACCESS_KEY
-//         });
+    if (req.method !== "POST") {
+      return res.status(405).json({
+        success: false,
+        message: "Method Not Allowed"
+      });
+    }
 
-//     } catch (err) {
-//         console.error(err);
-//         return res.status(500).json({
-//             success: false,
-//             message: err.message
-//         });
-//     }
-// }
+    const response = await fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        access_key: process.env.MY_ACCESS_KEY,
+        subject: "New message from your portfolio",
+        from_name: "Dharani N Portfolio",
+        ...req.body
+      })
+    });
+
+    const data = await response.json();
+
+    console.log("Web3Forms Response:", data);
+
+    return res.status(200).json(data);
+
+  } catch (error) {
+    console.error("API Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+}
