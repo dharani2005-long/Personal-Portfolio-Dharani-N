@@ -2,25 +2,39 @@ export default async function handler(req, res) {
 
     if (req.method !== "POST") {
         return res.status(405).json({
-            error: "Method not allowed"
+            success: false,
+            message: "Method Not Allowed"
         });
     }
 
-    const response = await fetch(
-        "https://api.web3forms.com/submit",
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                access_key: process.env.MY_ACCESS_KEY,
-                ...req.body
-            })
-        }
-    );
+    try {
 
-    const data = await response.json();
+        const response = await fetch(
+            "https://api.web3forms.com/submit",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    access_key: process.env.MY_ACCESS_KEY,
+                    subject: "New message from your portfolio",
+                    from_name: "Dharani N Portfolio",
+                    ...req.body
+                })
+            }
+        );
 
-    res.status(200).json(data);
+        const data = await response.json();
+
+        return res.status(200).json(data);
+
+    } catch (error) {
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        });
+
+    }
 }
