@@ -1,94 +1,91 @@
-// ===============================
-// Active Navbar on Scroll
-// ===============================
+// ================= Navbar Active =================
 
 const navAnchors = document.querySelectorAll(".navbar-nav .nav-link");
-const sections = document.querySelectorAll("section[id], main[id]");
+const sections = document.querySelectorAll("section[id]");
 
 window.addEventListener("scroll", () => {
-    let currentSectionId = "";
 
-    sections.forEach((section) => {
-        const sectionTop = section.offsetTop - 100;
+    let current = "";
 
-        if (window.pageYOffset >= sectionTop) {
-            currentSectionId = section.getAttribute("id");
+    sections.forEach(section => {
+
+        if (window.scrollY >= section.offsetTop - 100) {
+            current = section.id;
         }
+
     });
 
-    navAnchors.forEach((anchor) => {
-        anchor.classList.remove("active");
+    navAnchors.forEach(link => {
 
-        if (anchor.getAttribute("href") === "#" + currentSectionId) {
-            anchor.classList.add("active");
+        link.classList.remove("active");
+
+        if (link.getAttribute("href") === "#" + current) {
+            link.classList.add("active");
         }
+
     });
+
 });
 
-// ===============================
-// Contact Form
-// ===============================
+// ================= Contact Form =================
 
 const form = document.getElementById("contactForm");
+const submitBtn = form.querySelector("button");
+const formMessage = document.getElementById("formMessage");
 
-if (form) {
+form.addEventListener("submit", async (e) => {
 
-    const submitBtn = form.querySelector("button[type='submit']");
-    const formMessage = document.getElementById("formMessage");
+    e.preventDefault();
 
-    form.addEventListener("submit", async (e) => {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = "Sending...";
 
-        e.preventDefault();
+    formMessage.className = "d-none";
 
-        const formData = {
-            name: form.name.value,
-            email: form.email.value,
-            message: form.message.value
-        };
+    try {
 
-        const originalText = submitBtn.innerHTML;
+        const response = await fetch("/api/contact", {
 
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = "Sending...";
+            method: "POST",
 
-        formMessage.classList.add("d-none");
-//------------
-        try {
+            headers: {
+                "Content-Type": "application/json"
+            },
 
-    const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(formData)
-    });
+            body: JSON.stringify({
 
-    // Read the raw response
-    const responseText = await response.text();
+                name: form.name.value,
+                email: form.email.value,
+                message: form.message.value
 
-    console.log("Server Response:");
-    console.log(responseText);
+            })
 
-    // Show the response on the page
-    formMessage.className = "alert alert-info mt-3";
-    formMessage.innerHTML =
-        "<strong>Server Response:</strong><br><pre style='white-space:pre-wrap'>" +
-        responseText +
-        "</pre>";
+        });
 
-    return;
+        const result = await response.json();
 
-} catch (error) {
+        if (result.success) {
 
-    console.error(error);
+            formMessage.className = "alert alert-success mt-3";
+            formMessage.innerHTML = "Message sent successfully.";
 
-    formMessage.className = "alert alert-danger mt-3";
-    formMessage.innerHTML =
-        "<strong>Error!</strong> " + error.message;
+            form.reset();
 
-}
+        } else {
 
-        //--------------------
-    });
+            formMessage.className = "alert alert-danger mt-3";
+            formMessage.innerHTML = result.message;
 
-}
+        }
+
+    } catch (err) {
+
+        formMessage.className = "alert alert-danger mt-3";
+        formMessage.innerHTML = err.message;
+
+    }
+
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = "Send Message";
+
+});
