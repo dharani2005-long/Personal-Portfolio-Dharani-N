@@ -299,68 +299,32 @@
 
       <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
-          <form action="https://api.web3forms.com/submit" method="POST" id="Portfolio Contact Form">
+          <form id="contactForm">
+  <input type="checkbox" name="botcheck" style="display:none">
 
-    <input
-        type="hidden"
-        name="access_key"
-        value="31e883cc-6b41-4bdd-b8df-ed65a1d07ee4">
+  <div class="mb-3">
+    <label for="name" class="form-label">Your Name</label>
+    <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" required>
+  </div>
 
-    <input
-        type="hidden"
-        name="subject"
-        value="New Portfolio Message">
+  <div class="mb-3">
+    <label for="email" class="form-label">Your Email</label>
+    <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+  </div>
 
-    <input
-        type="hidden"
-        name="from_name"
-        value="Dharani Portfolio">
+  <div class="mb-3">
+    <label for="message" class="form-label">Message</label>
+    <textarea class="form-control" id="message" name="message" rows="5" placeholder="Write your message..." required></textarea>
+  </div>
 
-    <input type="checkbox" name="botcheck" style="display:none">
+  <div id="formMessage" class="alert d-none mt-3"></div>
 
-    <div class="mb-3">
-        <label for="name" class="form-label">Your Name</label>
-        <input
-            type="text"
-            class="form-control"
-            id="name"
-            name="name"
-            placeholder="Enter your name"
-            required>
-    </div>
-
-    <div class="mb-3">
-        <label for="email" class="form-label">Your Email</label>
-        <input
-            type="email"
-            class="form-control"
-            id="email"
-            name="email"
-            placeholder="Enter your email"
-            required>
-    </div>
-
-    <div class="mb-3">
-        <label for="message" class="form-label">Message</label>
-        <textarea
-            class="form-control"
-            id="message"
-            name="message"
-            rows="5"
-            placeholder="Write your message..."
-            required></textarea>
-    </div>
-
-    <!-- Success / Error Message -->
-    <div id="formMessage" class="alert d-none mt-3"></div>
-
-    <div class="text-center">
-        <button type="submit" class="btn btn-dark px-4">
-            Send Message
-        </button>
-    </div>
-
+  <div class="text-center">
+    <button type="submit" class="btn btn-dark px-4">Send Message</button>
+  </div>
 </form>
+
+
 
           <div class="text-center mt-4">
             <a class="text-secondary mx-2" href="https://github.com/dharani2005-long" target="_blank">GitHub</a>
@@ -398,7 +362,42 @@
         }
       });
     });
-      
+
+
+
+    
+  document.getElementById("contactForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const formMessage = document.getElementById("formMessage");
+    const data = {
+      name: document.getElementById("name").value,
+      email: document.getElementById("email").value,
+      message: document.getElementById("message").value,
+    };
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const result = await res.json();
+
+      formMessage.classList.remove("d-none", "alert-success", "alert-danger");
+      if (result.success) {
+        formMessage.classList.add("alert-success");
+        formMessage.textContent = "Message sent successfully!";
+        e.target.reset();
+      } else {
+        formMessage.classList.add("alert-danger");
+        formMessage.textContent = "Something went wrong. Please try again.";
+      }
+    } catch (err) {
+      formMessage.classList.remove("d-none");
+      formMessage.classList.add("alert-danger");
+      formMessage.textContent = "Error sending message.";
+    }
+  });
   </script>
 </body>
 </html>
