@@ -1,84 +1,118 @@
-// <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
-    const navAnchors = document.querySelectorAll(".navbar-nav .nav-link");
-    const sections = document.querySelectorAll("section[id], main[id]");
+// ===============================
+// Active Navbar on Scroll
+// ===============================
 
-    window.addEventListener("scroll", function () {
-      let currentSectionId = "";
+const navAnchors = document.querySelectorAll(".navbar-nav .nav-link");
+const sections = document.querySelectorAll("section[id], main[id]");
 
-      sections.forEach(function (section) {
+window.addEventListener("scroll", () => {
+    let currentSectionId = "";
+
+    sections.forEach((section) => {
         const sectionTop = section.offsetTop - 100;
-        if (window.pageYOffset >= sectionTop) {
-          currentSectionId = section.getAttribute("id");
-        }
-      });
 
-      navAnchors.forEach(function (anchor) {
-        anchor.classList.remove("active");
-        if (anchor.getAttribute("href") === "#" + currentSectionId) {
-          anchor.classList.add("active");
+        if (window.pageYOffset >= sectionTop) {
+            currentSectionId = section.getAttribute("id");
         }
-      });
     });
 
-    // ---
-      const form = document.getElementById("contactForm");
-const submitBtn = form.querySelector("button[type='submit']");
-const formMessage = document.getElementById("formMessage");
+    navAnchors.forEach((anchor) => {
+        anchor.classList.remove("active");
 
-form.addEventListener("submit", async function (e) {
-    e.preventDefault();
+        if (anchor.getAttribute("href") === "#" + currentSectionId) {
+            anchor.classList.add("active");
+        }
+    });
+});
 
-    const formData = {
-        name: form.name.value,
-        email: form.email.value,
-        message: form.message.value
-    };
+// ===============================
+// Contact Form
+// ===============================
 
-    const originalText = submitBtn.innerHTML;
+const form = document.getElementById("contactForm");
 
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = "Sending...";
+if (form) {
 
-    formMessage.classList.add("d-none");
+    const submitBtn = form.querySelector("button[type='submit']");
+    const formMessage = document.getElementById("formMessage");
 
-    try {
+    form.addEventListener("submit", async (e) => {
 
-        const response = await fetch("/api/contact", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(formData)
-        });
+        e.preventDefault();
 
-        const result = await response.json();
+        const formData = {
+            name: form.name.value,
+            email: form.email.value,
+            message: form.message.value
+        };
 
-        if (result.success) {
+        const originalText = submitBtn.innerHTML;
 
-            formMessage.className = "alert alert-success mt-3";
-            formMessage.innerHTML =
-                "<strong>Success!</strong> Your message has been sent successfully.";
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = "Sending...";
 
-            form.reset();
+        formMessage.classList.add("d-none");
 
-        } else {
+        try {
+
+            const response = await fetch("/api/contact", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(formData)
+            });
+
+            // Read response as text first
+            const responseText = await response.text();
+
+            console.log("Server Response:");
+            console.log(responseText);
+
+            let result;
+
+            try {
+                result = JSON.parse(responseText);
+            } catch (err) {
+                throw new Error(responseText);
+            }
+
+            if (response.ok && result.success) {
+
+                formMessage.className = "alert alert-success mt-3";
+                formMessage.innerHTML =
+                    "<strong>Success!</strong> Your message has been sent successfully.";
+
+                form.reset();
+
+            } else {
+
+                formMessage.className = "alert alert-danger mt-3";
+                formMessage.innerHTML =
+                    "<strong>Error!</strong> " +
+                    (result.message || "Something went wrong.");
+
+            }
+
+        } catch (error) {
+
+            console.error(error);
 
             formMessage.className = "alert alert-danger mt-3";
             formMessage.innerHTML =
-                "<strong>Error!</strong> " + result.message;
+                "<strong>Error!</strong><br><pre style='white-space:pre-wrap'>" +
+                error.message +
+                "</pre>";
+
+        } finally {
+
+            formMessage.classList.remove("d-none");
+
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+
         }
 
-    } catch (error) {
+    });
 
-        formMessage.className = "alert alert-danger mt-3";
-        formMessage.innerHTML =
-            "<strong>Error!</strong> Something went wrong. Please try again.";
-
-    } finally {
-
-        formMessage.classList.remove("d-none");
-
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalText;
-    }
-});
+}
