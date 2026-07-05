@@ -1,44 +1,47 @@
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({
-      success: false,
-      message: "Method Not Allowed"
-    });
-  }
 
-  try {
-    const body =
-      typeof req.body === "string"
-        ? JSON.parse(req.body)
-        : req.body;
+    if (req.method !== "POST") {
+        return res.status(405).json({
+            success: false,
+            message: "Method Not Allowed"
+        });
+    }
 
-    const response = await fetch("https://api.web3forms.com/submit", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        access_key: process.env.MY_ACCESS_KEY,
-        subject: "New message from your portfolio",
-        from_name: "Dharani N Portfolio",
-        name: body.name,
-        email: body.email,
-        message: body.message
-      })
-    });
+    try {
 
-    const data = await response.json();
+        const body =
+            typeof req.body === "string"
+                ? JSON.parse(req.body)
+                : req.body;
 
-    console.log("Web3Forms:", data);
+        const response = await fetch("https://api.web3forms.com/submit", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({
+                access_key: process.env.MY_ACCESS_KEY,
+                name: body.name,
+                email: body.email,
+                message: body.message,
+                subject: "Portfolio Contact",
+                from_name: "Dharani Portfolio"
+            })
+        });
 
-    return res.status(response.status).json(data);
+        const data = await response.json();
 
-  } catch (error) {
-    console.error(error);
+        return res.status(response.status).json(data);
 
-    return res.status(500).json({
-      success: false,
-      message: error.message
-    });
-  }
+    } catch (err) {
+
+        console.error(err);
+
+        return res.status(500).json({
+            success: false,
+            message: err.message
+        });
+
+    }
 }
