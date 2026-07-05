@@ -52,67 +52,43 @@ if (form) {
         submitBtn.innerHTML = "Sending...";
 
         formMessage.classList.add("d-none");
-
+//------------
         try {
 
-            const response = await fetch("/api/contact", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(formData)
-            });
+    const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
+    });
 
-            // Read response as text first
-            const responseText = await response.text();
+    // Read the raw response
+    const responseText = await response.text();
 
-            console.log("Server Response:");
-            console.log(responseText);
+    console.log("Server Response:");
+    console.log(responseText);
 
-            let result;
+    // Show the response on the page
+    formMessage.className = "alert alert-info mt-3";
+    formMessage.innerHTML =
+        "<strong>Server Response:</strong><br><pre style='white-space:pre-wrap'>" +
+        responseText +
+        "</pre>";
 
-            try {
-                result = JSON.parse(responseText);
-            } catch (err) {
-                throw new Error(responseText);
-            }
+    return;
 
-            if (response.ok && result.success) {
+} catch (error) {
 
-                formMessage.className = "alert alert-success mt-3";
-                formMessage.innerHTML =
-                    "<strong>Success!</strong> Your message has been sent successfully.";
+    console.error(error);
 
-                form.reset();
+    formMessage.className = "alert alert-danger mt-3";
+    formMessage.innerHTML =
+        "<strong>Error!</strong> " + error.message;
 
-            } else {
+}
 
-                formMessage.className = "alert alert-danger mt-3";
-                formMessage.innerHTML =
-                    "<strong>Error!</strong> " +
-                    (result.message || "Something went wrong.");
-
-            }
-
-        } catch (error) {
-
-            console.error(error);
-
-            formMessage.className = "alert alert-danger mt-3";
-            formMessage.innerHTML =
-                "<strong>Error!</strong><br><pre style='white-space:pre-wrap'>" +
-                error.message +
-                "</pre>";
-
-        } finally {
-
-            formMessage.classList.remove("d-none");
-
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalText;
-
-        }
-
+        //--------------------
     });
 
 }
