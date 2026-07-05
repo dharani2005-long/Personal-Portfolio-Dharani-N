@@ -1,4 +1,4 @@
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+// <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
     const navAnchors = document.querySelectorAll(".navbar-nav .nav-link");
     const sections = document.querySelectorAll("section[id], main[id]");
 
