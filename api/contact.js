@@ -8,7 +8,7 @@ export default async function handler(req, res) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        access_key: process.env.MY_ACCESS_KEY, // hidden on server
+        access_key: process.env.MY_ACCESS_KEY,
         subject: "New Portfolio Message",
         from_name: "Dharani Portfolio",
         name: req.body.name,
