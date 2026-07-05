@@ -296,7 +296,7 @@
 
       <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
-          <form action="https://api.web3forms.com/submit" method="POST">
+          <form action="https://api.web3forms.com/submit" method="POST" id="contactForm">
 
             <input type="hidden" name="access_key" value="MY_ACCESS_KEY">
             <input type="hidden" name="subject" value="New message from your portfolio">
@@ -316,6 +316,7 @@
               <label for="message" class="form-label">Message</label>
               <textarea name="message" id="message" rows="5" class="form-control" required></textarea>
             </div>
+            <div id="formMessage" class="alert d-none mt-3"></div>
             <div class="text-center">
               <button type="submit" class="btn btn-dark px-4">Send Message</button>
             </div>
@@ -357,6 +358,63 @@
         }
       });
     });
+
+    <!--  -->
+      const form = document.getElementById("contactForm");
+const submitBtn = form.querySelector("button[type='submit']");
+const formMessage = document.getElementById("formMessage");
+
+form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+
+    const originalText = submitBtn.innerHTML;
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = "Sending...";
+
+    formMessage.classList.add("d-none");
+
+    try {
+
+        const response = await fetch("https://api.web3forms.com/submit", {
+            method: "POST",
+            body: formData
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+
+            formMessage.className = "alert alert-success mt-3";
+            formMessage.innerHTML =
+                "<strong>Success!</strong> Your message has been sent successfully.";
+
+            form.reset();
+
+        } else {
+
+            formMessage.className = "alert alert-danger mt-3";
+            formMessage.innerHTML =
+                "<strong>Error!</strong> " + result.message;
+        }
+
+    } catch (error) {
+
+        formMessage.className = "alert alert-danger mt-3";
+        formMessage.innerHTML =
+            "<strong>Error!</strong> Something went wrong. Please try again.";
+
+    } finally {
+
+        formMessage.classList.remove("d-none");
+
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    }
+});
+      
   </script>
 </body>
 </html>
