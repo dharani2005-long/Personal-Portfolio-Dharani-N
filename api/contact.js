@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     }
 
     const response = await fetch(
-        "https://api.web3forms.com/submit",
+        "https://dharaninatarajan.vercel.app/submit",
         {
             method: "POST",
             headers: {
